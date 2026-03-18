@@ -14,4 +14,6 @@ import {
   getAllLeaveTypes,
   addLeaveType,
   updateLeaveType,
-  
+  deleteLeaveType,
+  type LeaveType
+} from "../actions"
