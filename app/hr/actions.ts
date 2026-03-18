@@ -183,6 +183,10 @@ export async function approveLeaveRequest(id: string, comments?: string) {
 export async function rejectLeaveRequest(id: string, reason: string) {
   const supabase = getSupabaseAdmin()
   const { error } = await supabase.from("leave_requests").update({ status: "rejected", reviewed_at: new Date().toISOString(), reviewer_comments: reason }).eq("id", id)
+  if (error) return { success: false, message: error.message }
+  return { success: true, message: "Leave rejected" }
+}
+
 export async function getHRDashboardStats() {
   const supabase = getSupabaseAdmin()
   const { count: totalEmployees } = await supabase.from("employees").select("*", { count: "exact", head: true }).eq("status", "active")
@@ -340,8 +344,4 @@ export async function createLeaveRequest(employeeId: string, requestData: any) {
   
   if (error) return { success: false, message: error.message }
   return { success: true, message: "Leave request submitted successfully" }
-} const firstDayOfMonth = new Date()
-  firstDayOfMonth.setDate(1)
-  const { count: newEmployees } = await supabase.from("employees").select("*", { count: "exact", head: true }).gte("join_date", firstDayOfMonth.toISOString().split("T")[0])
-  return { totalEmployees: totalEmployees || 0, pendingLeaves: pendingLeaves || 0, onLeaveToday: onLeaveToday || 0, newEmployees: newEmployees || 0 }
 }
