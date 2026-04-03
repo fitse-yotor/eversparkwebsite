@@ -57,10 +57,10 @@ export async function login(prevState: any, formData: FormData) {
   console.log("User role:", role)
 
   if (role === "super_admin" || role === "admin") {
-    console.log("Redirecting to HR dashboard...")
+    redirect("/admin/dashboard")
+  } else if (role === "hr") {
     redirect("/hr/dashboard")
   } else if (role === "employee") {
-    console.log("Redirecting to employee dashboard...")
     redirect("/employee/dashboard")
   } else {
     console.error("Unknown role:", role)
