@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   title: "Ever Spark Technologies - Water Treatment Solutions",
   description:
     "Leading provider of electrochlorination, solar, and water disinfection solutions for communities worldwide.",
-    generator: 'v0.app'
 }
 
 export default async function RootLayout({
@@ -20,7 +19,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const generalSettings = await getGeneralSettings() // Fetch general settings
+  // Gracefully handle DB errors so a missing table never breaks the whole site
+  const generalSettings = await getGeneralSettings().catch(() => null)
 
   return (
     <html lang="en">
