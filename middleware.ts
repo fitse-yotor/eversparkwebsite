@@ -54,6 +54,7 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Refresh the session — this is the primary job of middleware
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -62,8 +63,8 @@ export async function middleware(request: NextRequest) {
 
   // Public routes that don't require authentication
   const publicRoutes = ['/', '/about', '/contact', '/products', '/projects', '/solutions', '/blogs', '/login', '/api']
-  const isPublicRoute = publicRoutes.some(route => 
-    path === route || 
+  const isPublicRoute = publicRoutes.some(route =>
+    path === route ||
     path.startsWith(`${route}/`) ||
     path.startsWith('/api/') ||
     path.startsWith('/_next/') ||
@@ -73,56 +74,15 @@ export async function middleware(request: NextRequest) {
   // Auth routes
   const isAuthRoute = path.startsWith('/auth')
 
-  // If not authenticated and trying to access protected route
+  // If not authenticated and trying to access a protected route, redirect to login
   if (!user && !isPublicRoute && !isAuthRoute) {
     const redirectUrl = new URL('/login', request.url)
     redirectUrl.searchParams.set('redirectTo', path)
     return NextResponse.redirect(redirectUrl)
   }
 
-  // If authenticated, check role-based access
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    const userRole = profile?.role
-
-    // Redirect based on role if accessing root admin path
-    if (path === '/admin' || path === '/admin/') {
-      if (userRole === 'employee') {
-        return NextResponse.redirect(new URL('/employee/dashboard', request.url))
-      } else if (userRole === 'hr') {
-        return NextResponse.redirect(new URL('/hr/dashboard', request.url))
-      } else if (['admin', 'super_admin'].includes(userRole)) {
-        return NextResponse.redirect(new URL('/admin/dashboard', request.url))
-      }
-    }
-
-    // Role-based route protection
-    if (path.startsWith('/hr/')) {
-      // HR routes - only hr, admin and super_admin
-      if (!['hr', 'admin', 'super_admin'].includes(userRole)) {
-        return NextResponse.redirect(new URL('/unauthorized', request.url))
-      }
-    }
-
-    if (path.startsWith('/employee/')) {
-      // Employee routes - only employee role
-      if (userRole !== 'employee') {
-        return NextResponse.redirect(new URL('/unauthorized', request.url))
-      }
-    }
-
-    if (path.startsWith('/admin/')) {
-      // Admin routes - only admin and super_admin
-      if (!['admin', 'super_admin'].includes(userRole)) {
-        return NextResponse.redirect(new URL('/unauthorized', request.url))
-      }
-    }
-  }
+  // Role-based access is handled inside each protected layout/page
+  // to avoid making DB queries on the Edge Runtime here.
 
   return response
 }
