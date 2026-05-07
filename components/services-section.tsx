@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Wrench, Droplets, Zap, Shield, Recycle, Settings } from "lucide-react"
+import { getServiceItems, getServicesPageContent } from "@/app/admin/content/actions"
 
 interface ServiceItem {
   id: string
@@ -42,12 +43,14 @@ export function ServicesSection() {
     async function fetchData() {
       try {
         setLoading(true)
-        const response = await fetch("/api/services")
-        if (!response.ok) {
-          throw new Error("Failed to fetch services")
-        }
-        const result = await response.json()
-        setData(result)
+        const [services, pageContent] = await Promise.all([
+          getServiceItems(),
+          getServicesPageContent(),
+        ])
+        setData({
+          services,
+          pageContent: { subtitle: pageContent?.subtitle ?? null },
+        })
       } catch (err) {
         console.error("Error fetching services:", err)
         setError(err instanceof Error ? err.message : "Unknown error")
