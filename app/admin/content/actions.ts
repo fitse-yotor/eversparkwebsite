@@ -74,7 +74,7 @@ export async function getHeroData(): Promise<HeroData | null> {
     .from("hero_content")
     .select("title, subtitle, description, main_image_url")
     .eq("id", 1)
-    .single()
+    .maybeSingle()
   if (error) {
     console.error("Error fetching hero data:", error.message)
     return null
@@ -197,7 +197,7 @@ export async function getAboutUsData(): Promise<AboutUsData | null> {
     .from("about_us_content")
     .select("page_title, subtitle, story_title, story_content, story_image_url")
     .eq("id", 1)
-    .single()
+    .maybeSingle()
   if (error) {
     console.error("Error fetching about us data:", error.message)
     return null
@@ -307,7 +307,7 @@ export async function deleteTeamMember(memberId: string) {
 export async function getServicesPageContent(): Promise<ServicePageData | null> {
   const supabase = await createSupabaseServerClient()
   console.log("Attempting to fetch services page content...")
-  const { data, error } = await supabase.from("services_page_content").select("section_subtitle").eq("id", 1).single()
+  const { data, error } = await supabase.from("services_page_content").select("section_subtitle").eq("id", 1).maybeSingle()
   if (error) {
     console.error("Error fetching services page content:", error.message)
     return null
@@ -482,7 +482,7 @@ export async function getContactInfoData(): Promise<ContactInfoData | null> {
     .from("contact_info_content")
     .select("address, city, country, main_phone, support_phone, email, map_url, social_media_links")
     .eq("id", 1)
-    .single()
+    .maybeSingle()
   if (error) {
     console.error("Error fetching contact info:", error.message)
     return null
