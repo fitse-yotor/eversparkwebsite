@@ -50,7 +50,7 @@ export async function getGeneralSettings(): Promise<GeneralSettingsData | null> 
       "site_name, site_description, contact_email, contact_phone, address, timezone, language, site_logo_url, social_media_links",
     )
     .eq("id", 1)
-    .single()
+    .maybeSingle()
 
   if (error) {
     console.error("Error fetching general settings:", error.message)
@@ -106,7 +106,7 @@ export async function getSeoSettings(): Promise<SeoSettingsData | null> {
     .from("seo_settings")
     .select("meta_title, meta_description, meta_keywords, google_analytics_id, google_search_console, robots_txt")
     .eq("id", 1)
-    .single()
+    .maybeSingle()
 
   if (error) {
     console.error("Error fetching SEO settings:", error.message)
@@ -157,7 +157,7 @@ export async function getEmailSettings(): Promise<EmailSettingsData | null> {
       "smtp_host, smtp_port, smtp_username, smtp_password, from_email, from_name, enable_notifications, notification_email",
     )
     .eq("id", 1)
-    .single()
+    .maybeSingle()
 
   if (error) {
     console.error("Error fetching Email settings:", error.message)
